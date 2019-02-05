@@ -148,3 +148,8 @@
 `ifdef PITON_FPGA_SD_BOOT
     `define PITONSYS_NON_UART_BOOT
 `endif // endif PITON_FPGA_SD_BOOT
+
+// currently this board does not have an SD card slot
+`ifdef VCU118_BOARD
+  `undef PITONSYS_SPI
+`endif  
