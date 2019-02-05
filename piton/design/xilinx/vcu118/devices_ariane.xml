@@ -22,8 +22,8 @@ Description: Peripheral address map for OpenPiton+Ariane configurations.
     <port>
         <name>mem</name>
         <base>0x80000000</base>
-        <!-- 1 GB -->
-        <length>0x40000000</length>
+        <!-- 4 GB -->
+        <length>0x100000000</length>
     </port>
     <port>
         <name>iob</name>
@@ -31,12 +31,12 @@ Description: Peripheral address map for OpenPiton+Ariane configurations.
         <length>0x10</length>
         <noc2in/>
     </port>
-    <port>
+<!--     <port>
         <name>sd</name>
         <base>0xf000000000</base>
-        <!-- Give it up to reset PC + 1 MB-->
+         Give it up to reset PC + 1 MB
         <length>0xff0300000</length>
-    </port>
+    </port> -->
     <port>
         <name>uart</name>
         <base>0xfff0c2c000</base>
@@ -44,11 +44,11 @@ Description: Peripheral address map for OpenPiton+Ariane configurations.
         <length>0xd4000</length>
         <noc2in/>
     </port>
-    <port>
+<!--     <port>
         <name>net</name>
         <base>0xfff0d00000</base>
         <length>0x100000</length>
-    </port>
+    </port> -->
     <!-- note: the following modules are ariane-specific and are only instantiated in HW when using the ariane core -->
     <port>
         <!-- this is the shared debug module for JTAG access to all cores -->
@@ -72,7 +72,7 @@ Description: Peripheral address map for OpenPiton+Ariane configurations.
     <port>
         <name>ariane_plic</name>
         <base>0xfff1030000</base>
-        <length>0x10000</length>
+        <length>0x4000000</length>
     </port>
     <!-- end ariane specific periphs -->
 </devices>
