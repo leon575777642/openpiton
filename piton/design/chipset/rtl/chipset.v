@@ -368,7 +368,7 @@ module chipset(
         output                                              oled_vdd_n,
         output                                              oled_vbat_n,
         output                                              oled_rst_n,
-    `elseif VCU118_BOARD
+    `elsif VCU118_BOARD
         input                                               btnl,
         input                                               btnr,
         input                                               btnu,
