@@ -657,7 +657,7 @@ end
                 `else 
                     assign uart_boot_en    = sw[0];
                     assign uart_timeout_en = sw[1];
-                `end    
+                `endif    
             `endif // endif PITONSYS_NON_UART_BOOT
         `endif // endif PITONSYS_UART_BOOT
     `endif // endif PITONSYS_UART
