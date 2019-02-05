@@ -183,15 +183,21 @@ module system(
 `ifdef PITON_FPGA_MC_DDR3
     // Generalized interface for any FPGA board we support.
     // Not all signals will be used for all FPGA boards (see constraints)
+    `ifdef VCU118_BOARD
+    output                                      ddr_act_n,
+    output [`DDR3_BG_WIDTH-1:0]                 ddr_bg,
+    `else // VCU118_BOARD
+    output                                      ddr_cas_n,
+    output                                      ddr_ras_n,
+    output                                      ddr_we_n,
+    `endif
+
     output [`DDR3_ADDR_WIDTH-1:0]               ddr_addr,
     output [`DDR3_BA_WIDTH-1:0]                 ddr_ba,
-    output                                      ddr_cas_n,
     output [`DDR3_CK_WIDTH-1:0]                 ddr_ck_n,
     output [`DDR3_CK_WIDTH-1:0]                 ddr_ck_p,
     output [`DDR3_CKE_WIDTH-1:0]                ddr_cke,
-    output                                      ddr_ras_n,
     output                                      ddr_reset_n,
-    output                                      ddr_we_n,
     inout  [`DDR3_DQ_WIDTH-1:0]                 ddr_dq,
     inout  [`DDR3_DQS_WIDTH-1:0]                ddr_dqs_n,
     inout  [`DDR3_DQS_WIDTH-1:0]                ddr_dqs_p,
@@ -267,9 +273,20 @@ module system(
     output                                      oled_vdd_n,
     output                                      oled_vbat_n,
     output                                      oled_rst_n,
+`elseif VCU118_BOARD
+    input                                       btnl,
+    input                                       btnr,
+    input                                       btnu,
+    input                                       btnd,
+    input                                       btnc,    
 `endif
 
+`ifdef VCU118_BOARD
+    // we only have 4 gpio dip switches on this board
+    input  [3:0]                                sw,
+`else 
     input  [7:0]                                sw,
+`endif
     output [7:0]                                leds
 
 );
@@ -820,15 +837,20 @@ chipset chipset(
     // DRAM and I/O interfaces
 `ifndef PITONSYS_NO_MC
 `ifdef PITON_FPGA_MC_DDR3
+`ifdef VCU118_BOARD
+    .ddr_act_n(ddr_act_n),                    
+    .ddr_bg(ddr_bg), 
+`else // VCU118_BOARD
+    .ddr_cas_n(ddr_cas_n),
+    .ddr_ras_n(ddr_ras_n),
+    .ddr_we_n(ddr_we_n),
+`endif
     .ddr_addr(ddr_addr),
     .ddr_ba(ddr_ba),
-    .ddr_cas_n(ddr_cas_n),
     .ddr_ck_n(ddr_ck_n),
     .ddr_ck_p(ddr_ck_p),
     .ddr_cke(ddr_cke),
-    .ddr_ras_n(ddr_ras_n),
     .ddr_reset_n(ddr_reset_n),
-    .ddr_we_n(ddr_we_n),
     .ddr_dq(ddr_dq),
     .ddr_dqs_n(ddr_dqs_n),
     .ddr_dqs_p(ddr_dqs_p),
@@ -896,6 +918,12 @@ chipset chipset(
     .oled_vdd_n(oled_vdd_n),
     .oled_vbat_n(oled_vbat_n),
     .oled_rst_n(oled_rst_n),
+`elsif VCU118_BOARD
+    .btnl(btnl),
+    .btnr(btnr),
+    .btnu(btnu),
+    .btnd(btnd),
+    .btnc(btnc),
 `endif
 
     .sw(sw),
