@@ -24,10 +24,19 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Clock signals
-set_property -dict {PACKAGE_PIN F31 DIFF_SSTL12}        [get_ports "chipset_clk_osc_n"] ;# Bank  47 VCCO - VCC1V2_FPGA - IO_L13N_T2L_N1_GC_QBC_47
-set_property -dict {PACKAGE_PIN G31 DIFF_SSTL12}        [get_ports "chipset_clk_osc_p"] ;# Bank  47 VCCO - VCC1V2_FPGA - IO_L13P_T2L_N0_GC_QBC_47
+set_property -dict {PACKAGE_PIN F31 IOSTANDARD DIFF_SSTL12}        [get_ports "chipset_clk_osc_n"] ;# Bank  47 VCCO - VCC1V2_FPGA - IO_L13N_T2L_N1_GC_QBC_47
+set_property -dict {PACKAGE_PIN G31 IOSTANDARD DIFF_SSTL12}        [get_ports "chipset_clk_osc_p"] ;# Bank  47 VCCO - VCC1V2_FPGA - IO_L13P_T2L_N0_GC_QBC_47
 
-set_property CLOCK_DEDICATED_ROUTE BACKBONE [get_nets chipset/clk_mmcm/inst/clk_in1_clk_mmcm]
+## Add some additional constraints for JTAG signals, set to 20MHz to be on the safe side
+create_clock -period 50.000 -name tck_i [get_ports tck_i]
+# minimize routing delay
+set_max_delay -to   [get_ports td_o     ] 5 
+set_max_delay -from [get_ports td_i     ] 5 
+set_max_delay -from [get_ports tms_i    ] 5
+set_max_delay -from [get_ports trst_ni  ] 5
+
+# constrain clock domain crossing
+set_max_delay  -from [get_clocks tck_i] -to [get_clocks -include_generated_clocks chipset_clk_osc_p] 5
 
 
 # Reset
@@ -38,8 +47,9 @@ set_false_path -to [get_cells -hierarchical *afifo_ui_rst_r*]
 set_false_path -to [get_cells -hierarchical *ui_clk_sync_rst_r*]
 set_false_path -to [get_cells -hierarchical *ui_clk_syn_rst_delayed*]
 set_false_path -to [get_cells -hierarchical *init_calib_complete_f*]
-set_false_path -from [get_clocks chipset_clk_clk_mmcm] -to [get_clocks net_axi_clk_clk_mmcm]
-set_false_path -from [get_clocks net_axi_clk_clk_mmcm] -to [get_clocks chipset_clk_clk_mmcm]
+# net not instantiated yet
+#set_false_path -from [get_clocks chipset_clk_clk_mmcm] -to [get_clocks net_axi_clk_clk_mmcm]
+#set_false_path -from [get_clocks net_axi_clk_clk_mmcm] -to [get_clocks chipset_clk_clk_mmcm]
 
 
 ## PMOD Header J53     
@@ -54,7 +64,7 @@ set_property -dict {PACKAGE_PIN P29 IOSTANDARD LVCMOS12} [get_ports trst_ni] ;# 
 #set_property -dict {PACKAGE_PIN R29 IOSTANDARD LVCMOS12} [get_ports ]    ;# Bank  47 VCCO - VCC1V2_FPGA - IO_L1N_T0L_N1_DBC_47 
 
 # accept sub-optimal placement
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets tck_i_IBUF]
+#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets tck_i_IBUF]
 
 
 
@@ -143,8 +153,8 @@ set_property PACKAGE_PIN F13      [get_ports "ddr_cs_n"] ;# Bank  71 VCCO - VCC1
 set_property PACKAGE_PIN C8       [get_ports "ddr_odt"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L7N_T1L_N1_QBC_AD13N_71
 set_property PACKAGE_PIN A10      [get_ports "ddr_cke"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_T1U_N12_71
 
-set_property PACKAGE_PIN G15      [get_ports "ddr_ba[0"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L17P_T2U_N8_AD10P_71
-set_property PACKAGE_PIN G13      [get_ports "ddr_ba[1"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L15N_T2L_N5_AD11N_71
+set_property PACKAGE_PIN G15      [get_ports "ddr_ba[0]"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L17P_T2U_N8_AD10P_71
+set_property PACKAGE_PIN G13      [get_ports "ddr_ba[1]"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L15N_T2L_N5_AD11N_71
 
 set_property PACKAGE_PIN D14      [get_ports "ddr_addr[0]"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_T3U_N12_71
 set_property PACKAGE_PIN B15      [get_ports "ddr_addr[1]"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L24N_T3U_N11_71
@@ -283,28 +293,8 @@ set_property PACKAGE_PIN F11      [get_ports "ddr_dq[0]"] ;# Bank  71 VCCO - VCC
 #set_property PACKAGE_PIN F15      [get_ports "ddr_addr[16_RAS_B"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L17N_T2U_N9_AD10N_71
 #set_property PACKAGE_PIN A20      [get_ports "DDR4_C1_TEN"] ;# Bank  73 VCCO - VCC1V2_FPGA - IO_T3U_N12_73
 
-##############################################
-## Timing
-##############################################
-
 ## False paths
-set_clock_groups -name sync_gr1 -logically_exclusive -group [get_clocks chipset_clk_clk_mmcm] -group [get_clocks -include_generated_clocks mc_sys_clk_clk_mmcm]
-
-
-## Add some additional constraints for JTAG signals, set to 20MHz to be on the safe side
-create_clock -period 50.000 -name { tck_i } [get_ports tck_i]
-# minimize routing delay
-set_max_delay -to   [get_ports { td_i    } ] 5 
-set_max_delay -from [get_ports { tms_i   } ] 5 
-set_max_delay -from [get_ports { trst_ni } ] 5
-
-# reset signal 
-set_false_path -from [get_ports { trst_ni } ]
-
-# constrain clock domain crossing
-set_false_path -from [get_clocks tck_i] -to [get_clocks chipset_clk]
-set_max_delay  -from [get_clocks tck_i] -to [get_clocks chipset_clk] 5
-
+#set_clock_groups -name sync_gr1 -logically_exclusive -group [get_clocks chipset_clk_clk_mmcm] -group [get_clocks -include_generated_clocks mc_sys_clk_clk_mmcm]
 
 ## Ethernet Constraints for 100 Mb/s
 

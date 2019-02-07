@@ -225,28 +225,30 @@ module system(
     inout   [3:0]                               sd_dat,
 `endif // endif PITONSYS_SPI
 
-// Emaclite interface
-`ifdef GENESYS2_BOARD
-    output                                          net_phy_txc,
-    output                                          net_phy_txctl,
-    output      [3:0]                               net_phy_txd,
-    input                                           net_phy_rxc,
-    input                                           net_phy_rxctl,
-    input       [3:0]                               net_phy_rxd,
-    output                                          net_phy_rst_n,
-    inout                                           net_phy_mdio_io,
-    output                                          net_phy_mdc,
-`elsif NEXYSVIDEO_BOARD
-    output                                          net_phy_txc,
-    output                                          net_phy_txctl,
-    output      [3:0]                               net_phy_txd,
-    input                                           net_phy_rxc,
-    input                                           net_phy_rxctl,
-    input       [3:0]                               net_phy_rxd,
-    output                                          net_phy_rst_n,
-    inout                                           net_phy_mdio_io,
-    output                                          net_phy_mdc,
-`endif
+`ifdef PITON_FPGA_ETHERNETLITE
+    // Emaclite interface
+    `ifdef GENESYS2_BOARD
+        output                                          net_phy_txc,
+        output                                          net_phy_txctl,
+        output      [3:0]                               net_phy_txd,
+        input                                           net_phy_rxc,
+        input                                           net_phy_rxctl,
+        input       [3:0]                               net_phy_rxd,
+        output                                          net_phy_rst_n,
+        inout                                           net_phy_mdio_io,
+        output                                          net_phy_mdc,
+    `elsif NEXYSVIDEO_BOARD
+        output                                          net_phy_txc,
+        output                                          net_phy_txctl,
+        output      [3:0]                               net_phy_txd,
+        input                                           net_phy_rxc,
+        input                                           net_phy_rxctl,
+        input       [3:0]                               net_phy_rxd,
+        output                                          net_phy_rst_n,
+        inout                                           net_phy_mdio_io,
+        output                                          net_phy_mdc,
+    `endif
+`endif // PITON_FPGA_ETHERNETLITE
 `endif // endif PITONSYS_IOCTRL
 
 `ifdef GENESYS2_BOARD
@@ -882,16 +884,17 @@ chipset chipset(
     .sd_cmd(sd_cmd),
     .sd_dat(sd_dat),
 `endif // endif PITONSYS_SPI
-
-    .net_phy_txc        (net_phy_txc),
-    .net_phy_txctl      (net_phy_txctl),
-    .net_phy_txd        (net_phy_txd),
-    .net_phy_rxc        (net_phy_rxc),
-    .net_phy_rxctl      (net_phy_rxctl),
-    .net_phy_rxd        (net_phy_rxd),
-    .net_phy_rst_n      (net_phy_rst_n),
-    .net_phy_mdio_io    (net_phy_mdio_io),
-    .net_phy_mdc        (net_phy_mdc),
+    `ifdef PITON_FPGA_ETHERNETLITE
+        .net_phy_txc        (net_phy_txc),
+        .net_phy_txctl      (net_phy_txctl),
+        .net_phy_txd        (net_phy_txd),
+        .net_phy_rxc        (net_phy_rxc),
+        .net_phy_rxctl      (net_phy_rxctl),
+        .net_phy_rxd        (net_phy_rxd),
+        .net_phy_rst_n      (net_phy_rst_n),
+        .net_phy_mdio_io    (net_phy_mdio_io),
+        .net_phy_mdc        (net_phy_mdc),
+    `endif // PITON_FPGA_ETHERNETLITE    
 `endif // endif PITONSYS_IOCTRL
 
 `ifdef GENESYS2_BOARD

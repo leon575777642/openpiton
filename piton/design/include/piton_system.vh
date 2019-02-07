@@ -116,6 +116,8 @@
 
 `ifdef VC707_BOARD
     `define PITON_CHIPSET_DIFF_CLK
+`elsif VCU118_BOARD
+    `define PITON_CHIPSET_DIFF_CLK
 `elsif GENESYS2_BOARD
     `define PITON_CHIPSET_DIFF_CLK
 `elsif PITON_BOARD
@@ -152,4 +154,5 @@
 // currently this board does not have an SD card slot
 `ifdef VCU118_BOARD
   `undef PITONSYS_SPI
+  `undef PITON_FPGA_SD_BOOT
 `endif  
