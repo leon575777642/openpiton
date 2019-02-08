@@ -41,13 +41,17 @@ module mc_top (
     input                           mc_flit_out_rdy,
 
     input                           uart_boot_en,
-
-    input                           sys_clk,
-
+    
 `ifdef VCU118_BOARD
+    // directly feed in 250MHz ref clock
+    input                           sys_clk_p,
+    input                           sys_clk_n,
+
     output                          ddr_act_n,
     output [`DDR3_BG_WIDTH-1:0]     ddr_bg,
 `else // VCU118_BOARD
+    input                           sys_clk,
+
     output                          ddr_cas_n,
     output                          ddr_ras_n,
     output                          ddr_we_n,
@@ -307,7 +311,8 @@ assign app_hi_pri = 1'b0;
   
 ddr4_0 i_ddr4_0 (
   .sys_rst                   ( sys_rst_n                 ),
-  .c0_sys_clk_i              ( sys_clk                   ),
+  .c0_sys_clk_p              ( sys_clk_p                 ),
+  .c0_sys_clk_n              ( sys_clk_n                 ),
   .dbg_clk                   (                           ), // not used 
   .dbg_bus                   (                           ), // not used
   .c0_ddr4_ui_clk            ( ui_clk                    ),

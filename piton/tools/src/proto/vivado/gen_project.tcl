@@ -191,6 +191,29 @@ set_property "used_in" "synthesis implementation" $file_obj
 set_property "used_in_implementation" "1" $file_obj
 set_property "used_in_synthesis" "1" $file_obj
 
+# add scoped constraint for DDR4 MIG pin locations if needed
+# these constraints would clash with the MIG generated timing and IO standard
+# constraints if we would just put them in the toplevel constraints.xdc. the 
+# solution is to scope them to the same instance
+set constraints_file "${BOARD_DIR}/ddr4_mig_pin_loc.xdc"
+if {[file exists ${constraints_file}]} {
+  puts "Info: Add scoped port location constraints for DDR4 MIG"
+  add_files -norecurse -fileset $fileset_obj $constraints_file
+  set file_obj [get_files -of_objects $fileset_obj [list "$constraints_file"]]
+  set_property "file_type" "XDC" $file_obj
+  set_property "is_enabled" "1" $file_obj
+  set_property "is_global_include" "0" $file_obj
+  set_property "library" "xil_defaultlib" $file_obj
+  set_property "path_mode" "RelativeFirst" $file_obj
+  set_property "processing_order" "NORMAL" $file_obj
+  set_property "scoped_to_cells" "" $file_obj
+  # scoping
+  set_property "scoped_to_ref" "ddr4_0_ddr4" $file_obj
+  set_property "used_in" "synthesis implementation" $file_obj
+  set_property "used_in_implementation" "1" $file_obj
+  set_property "used_in_synthesis" "1" $file_obj
+}
+
 # Set 'constrs_1' fileset properties
 set_property "name" "constrs_1" $fileset_obj
 set_property "target_constrs_file" "$constraints_file" $fileset_obj

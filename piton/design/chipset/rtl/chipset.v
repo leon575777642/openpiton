@@ -93,6 +93,13 @@ module chipset(
     `else // ifndef PITON_CHIPSET_DIFF_CLK
         input                                       clk_osc,
     `endif // endif PITON_CHIPSET_DIFF_CLK
+
+    // 250MHz diff input ref clock for DDR4 memory controller
+    `ifdef VCU118_BOARD
+        input                                       mc_clk_p,
+        input                                       mc_clk_n,
+    `endif // VCU118_BOARD
+
 `else // ifndef PITON_CHIPSET_CLKS_GEN
     input                                       chipset_clk,
 
@@ -1136,7 +1143,13 @@ chipset_impl_noc_power_test  chipset_impl (
 
     `ifndef PITONSYS_NO_MC
     `ifdef PITON_FPGA_MC_DDR3
-        .mc_clk         (mc_clk             ),
+        // Memory controller clock
+        `ifdef VCU118_BOARD
+            .mc_clk_p(mc_clk_p),
+            .mc_clk_n(mc_clk_n),
+        `else  // VCU118_BOARD                               
+            .mc_clk(mc_clk),
+        `endif  // VCU118_BOARD                               
     `endif // endif PITON_FPGA_MC_DDR3
     `endif // endif PITONSYS_NO_MC
 

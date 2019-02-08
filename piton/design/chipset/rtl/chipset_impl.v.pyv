@@ -85,7 +85,12 @@ module chipset_impl(
 
 `ifndef PITONSYS_NO_MC
 `ifdef PITON_FPGA_MC_DDR3
+`ifdef VCU118_BOARD
+    input                                       mc_clk_p,
+    input                                       mc_clk_n,
+`else  // VCU118_BOARD                               
     input                                       mc_clk,
+`endif // VCU118_BOARD
 `endif // endif PITON_FPGA_MC_DDR3
 `endif // endif PITONSYS_NO_MC
 
@@ -602,8 +607,6 @@ mc_top mc_top(
 
     .core_ref_clk(chipset_clk),
 
-    .sys_clk(mc_clk),
-
     .sys_rst_n(chipset_rst_n),
 
     .mc_flit_in_val(buf_mem_noc2_valid),
@@ -617,9 +620,12 @@ mc_top mc_top(
     .uart_boot_en(uart_boot_en),
 
 `ifdef VCU118_BOARD
+    .sys_clk_p(mc_clk_p),
+    .sys_clk_n(mc_clk_n),
     .ddr_act_n(ddr_act_n),                    
     .ddr_bg(ddr_bg), 
 `else // VCU118_BOARD
+    .sys_clk(mc_clk),
     .ddr_cas_n(ddr_cas_n),
     .ddr_ras_n(ddr_ras_n),
     .ddr_we_n(ddr_we_n),

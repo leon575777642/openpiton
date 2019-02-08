@@ -23,20 +23,37 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# some constraints from the example design
+set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 8 [current_design]
+set_property BITSTREAM.CONFIG.EXTMASTERCCLK_EN div-1 [current_design]
+set_property BITSTREAM.CONFIG.SPI_FALL_EDGE YES [current_design]
+set_property BITSTREAM.CONFIG.SPI_OPCODE 8'h6B [current_design]
+set_property CONFIG_MODE SPIx8 [current_design]
+set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
+set_property BITSTREAM.CONFIG.UNUSEDPIN Pulldown [current_design]
+set_property CONFIG_VOLTAGE 1.8 [current_design]
+
 # Clock signals
 set_property -dict {PACKAGE_PIN F31 IOSTANDARD DIFF_SSTL12}        [get_ports "chipset_clk_osc_n"] ;# Bank  47 VCCO - VCC1V2_FPGA - IO_L13N_T2L_N1_GC_QBC_47
 set_property -dict {PACKAGE_PIN G31 IOSTANDARD DIFF_SSTL12}        [get_ports "chipset_clk_osc_p"] ;# Bank  47 VCCO - VCC1V2_FPGA - IO_L13P_T2L_N0_GC_QBC_47
 
+# ref clock for MIG
+set_property PACKAGE_PIN E12 [ get_ports "mc_clk_p" ]
+set_property IOSTANDARD DIFF_SSTL12 [ get_ports "mc_clk_p" ]
+set_property PACKAGE_PIN D12 [ get_ports "mc_clk_n" ]
+set_property IOSTANDARD DIFF_SSTL12 [ get_ports "mc_clk_n" ]
+
+
 ## Add some additional constraints for JTAG signals, set to 20MHz to be on the safe side
 create_clock -period 50.000 -name tck_i [get_ports tck_i]
 # minimize routing delay
-set_max_delay -to   [get_ports td_o     ] 5 
+set_max_delay -datapath_only -from [get_pins */i_dmi_jtag_tap/td_o_reg/Q] -to [get_ports td_o     ] 5 
 set_max_delay -from [get_ports td_i     ] 5 
 set_max_delay -from [get_ports tms_i    ] 5
 set_max_delay -from [get_ports trst_ni  ] 5
 
 # constrain clock domain crossing
-set_max_delay  -from [get_clocks tck_i] -to [get_clocks -include_generated_clocks chipset_clk_osc_p] 5
+set_max_delay  -from [get_clocks tck_i] -to [get_clocks -include_generated_clocks chipset_clk_osc_p] 10
 
 
 # Reset
@@ -170,6 +187,11 @@ set_property PACKAGE_PIN C12      [get_ports "ddr_addr[10]"] ;# Bank  71 VCCO - 
 set_property PACKAGE_PIN B13      [get_ports "ddr_addr[11]"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L19N_T3L_N1_DBC_AD9N_71
 set_property PACKAGE_PIN C13      [get_ports "ddr_addr[12]"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L19P_T3L_N0_DBC_AD9P_71
 set_property PACKAGE_PIN D15      [get_ports "ddr_addr[13]"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_T2U_N12_71
+set_property PACKAGE_PIN H14      [get_ports "ddr_addr[14]"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L18N_T2U_N11_AD2N_71
+set_property PACKAGE_PIN H15      [get_ports "ddr_addr[15]"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L18P_T2U_N10_AD2P_71
+set_property PACKAGE_PIN F15      [get_ports "ddr_addr[16]"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L17N_T2U_N9_AD10N_71
+
+
 
 #set_property PACKAGE_PIN C9       [get_ports "ddr_dm[9]"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L7P_T1L_N0_QBC_AD13P_71
 #set_property PACKAGE_PIN E24      [get_ports "ddr_dm[8]"] ;# Bank  72 VCCO - VCC1V2_FPGA - IO_L19P_T3L_N0_DBC_AD9P_72
@@ -288,9 +310,6 @@ set_property PACKAGE_PIN F11      [get_ports "ddr_dq[0]"] ;# Bank  71 VCCO - VCC
 # unused
 #set_property PACKAGE_PIN R17      [get_ports "ddr_addr[LERT_B"] ;# Bank  73 VCCO - VCC1V2_FPGA - IO_L1N_T0L_N1_DBC_73
 #set_property PACKAGE_PIN G10      [get_ports "DDR4_C1_PAR"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L1N_T0L_N1_DBC_71
-#set_property PACKAGE_PIN H14      [get_ports "ddr_addr[14_WE_B"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L18N_T2U_N11_AD2N_71
-#set_property PACKAGE_PIN H15      [get_ports "ddr_addr[15_CAS_B"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L18P_T2U_N10_AD2P_71
-#set_property PACKAGE_PIN F15      [get_ports "ddr_addr[16_RAS_B"] ;# Bank  71 VCCO - VCC1V2_FPGA - IO_L17N_T2U_N9_AD10N_71
 #set_property PACKAGE_PIN A20      [get_ports "DDR4_C1_TEN"] ;# Bank  73 VCCO - VCC1V2_FPGA - IO_T3U_N12_73
 
 ## False paths
