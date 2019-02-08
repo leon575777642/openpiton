@@ -192,11 +192,17 @@ static void init_tls()
 
 void _init(int cid, int nc)
 {
-  init_tls();
-  thread_entry(cid, nc);
-
+ 
   // only single-threaded programs should ever get here.
-  int ret = main(0, 0);
+  if(nc!=1) {
+    return;
+  }
+
+  init_tls();
+
+  char num[2]   = {cid, nc};
+  char *argv[1] = {num};
+  int ret = main(2, argv);
 
   char buf[NUM_COUNTERS * 32] __attribute__((aligned(64)));
   char* pbuf = buf;
